@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<style>
+    #dry {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    #dry img {
+        width: 10vw;
+    }
+
+    #dry .box {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+
+    #dry span {
+        width: 100%;
+    }
+</style>
+
+<body>
+    <form action="/" method="post">
+        <p style="padding-left: 50px;">กรุณาเลือกเครื่องสักผ้า</p>
+        <div id="dry">
+            <% for(let i=0; i < Object.keys(data).length;i++) { %>
+                <label for="laundry<%= i%>">
+                    <div class="box">
+                        <img src="./img/laundry.png">
+                        <div>
+                            <% if (data[i]['valid_status']) { %>
+                                <p>
+                                    เครื่องที่ <%= (i+1) %>
+                                        <input id="laundry<%= i%>" name="id" type="radio" value="<%= i%>">
+                                        <p>สถานะ : พร้อมใช้งาน</p>
+                                </p>
+                                <% } else { %>
+                                    <p>
+                                        เครื่องที่ <%= (i+1) %>
+                                            <p>สถานะ : กำลังซัก</p>
+                                            <p id="test<%= (i) %>">จับเวลา : 00:00:00
+                                            </p>
+                                            <p>ระยะเวลาซัก : <%= data[i]['time']%> นาที</p>
+                                            <p>เวลาสิ้นสุด : <%= [new Date(data[i]['timeout']).getHours(), new
+                                                    Date(data[i]['timeout']).getMinutes()].join(':') %> น.
+                                            </p>
+                                    </p>
+                                    <% } %>
+                        </div>
+                    </div>
+                </label>
+                <script>
+                    fetch("data")
+                        .then(response => response.json())
+                        .then((data) => {
+                            //document.getElementById('hahaha').innerHTML = data[0]['valid_status']
+                        })
+                        .catch(console.error);
+                    /*fetch('./data.json')
+                        .then(res => res.json())
+                        .then(data => {
+                            console.log(data);
+                        })*/
+                    // Set the date we're counting down to
+                    if ('<%= data[i]['timeout']%>' != "EXPIRED" && "<%= data[i]['timeout']%>" != "") {
+                        let timmer = document.getElementById('test<%= (i) %>')
+                        var countDownDate<%= i %> = new Date("<%= data[i]['timeout']%>").getTime();
+                        // Update the count down every 1 second
+                        var x<%= i %> = setInterval(function () {
+
+                            // Get today's date and time
+                            let now = new Date().getTime();
+
+                            // Find the distance between now and the count down date
+                            let distance = countDownDate<%= i %> - now;
+
+                            // Time calculations for days, hours, minutes and seconds
+                            //var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                            let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                            let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                            let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                            // Output the result in an element with id="demo"
+                            timmer.innerHTML = "จับเวลา : " + hours + "h "
+                                + minutes + "m " + seconds + "s ";
+
+                            // If the count down is over, write some text 
+                            if (distance < 0) {
+                                clearInterval(x<%= i %>);
+                                timmer.innerHTML = "จับเวลา : EXPIRED";
+                            }
+                        }, 1000);
+                    }
+                </script>
+                <%}%>
+        </div>
+        <div style="display: grid;padding-left: 25px;">
+            <div>
+                เลือกโหมด<br>
+                <input id="Normal" name="mode" type="radio" value="Normal">
+                <label for="Normal">ซักแบบปกติ</label><br>
+                <input id="Quick wash" name="mode" type="radio" value="Quick wash">
+                <label for="Quick wash">ซักแบบด่วน</label><br>
+                <input id="Delicate" name="mode" type="radio" value="Delicate">
+                <label for="Delicate">ซักแบบถนอม</label><br>
+                <input id="Rinse_spin" name="mode" type="radio" value="Rinse And Spin">
+                <label for="Rinse_spin">ซักน้ำเปล่าและปั่นแห้ง</label>
+            </div>
+            <br>
+            <div>
+                <input type="hidden" name="monney" value="0">
+                <span>จำนวนเงินที่ต้องชำละ</span><label id="mode"> 0 บาท</label><br>
+                <span>จำนวนเงิน</span><label id="monney"> 0 บาท</label><br>
+                <div>
+                    <button class="monney" type="button" value="1">1 บาท</button>
+                    <button class="monney" type="button" value="5">5 บาท</button>
+                    <button class="monney" type="button" value="10">10 บาท</button>
+                </div>
+
+            </div>
+            <div><br>
+                <button type="submit" value="submit" style="width: 150px;">submit</button>
+            </div>
+            <script>
+                var monney = document.getElementsByClassName('monney');
+                var mode = document.getElementsByName('mode');
+
+                for (let i = 0; i < mode.length; i++) {
+                    mode[i].addEventListener('click', function () {
+                        <% for (let i = 0; i < Object.keys(data[0]['mode']).length; i++) { %>
+                            
+                            if ('<%= data[0]['mode'][i]['title'] %>' == mode[i].getAttribute('value')){
+                        document.getElementById('mode').innerText = ' <%= data[0]['mode'][i]['monney'] %> บาท';
+                    }
+
+                        <% } %>
+
+                    /*
+                                            for(let i = 0;i < Object.keys(data).length;i++;){
+                                                if(){
+                    
+                                                }
+                                            }*/
+
+
+                    })
+                }
+
+                for (let i = 0; i < monney.length; i++) {
+                    monney[i].addEventListener('click', function () {
+                        let m = +document.getElementsByName('monney')[0].value;
+                        document.getElementsByName('monney')[0].value = m + +monney[i].value;
+                        document.getElementById('monney').innerText = ` ${document.getElementsByName('monney')[0].value} บาท`;
+                    })
+                }
+
+            </script>
+        </div>
+
+
+    </form>
+</body>
+
+</html>
